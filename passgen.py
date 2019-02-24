@@ -51,20 +51,29 @@ class PassGen:
 
     def cases(self, word):
         return [word.lower(), word.title()]    
+    
+    def fullname(self, fname, lname):
+        return ['{}{}'.format(a, b) for a in self.cases(fname) for b in self.cases(lname)]
 
     def format_names(self):                        
         for _ in range(1000):
 
+            iters = 0
             for data in [self.target, self.spouse, self.child, self.pet]:
 
                 for n in ['firstname', 'lastname', 'nickname']:
 
+                    fullname_list = []
                     name = data[n].strip()
 
                     if not len(name):
                         continue
-
-                    for word in self.cases(name):
+                    
+                    if not iters:
+                        fullname_list = self.fullname(data['firstname'], data['lastname'])
+                        iters += 1
+                    
+                    for word in self.cases(name) + fullname_list:
 
                         a, b, c = ('{}{}'.format(word, _), 
                                   '{}{}'.format(_, word), 
