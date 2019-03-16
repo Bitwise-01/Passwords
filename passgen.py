@@ -13,7 +13,7 @@ def is_integer(input_string):
     return True
 
 
-def is_birthday(input_string):
+def is_date(input_string):
     if len(input_string) != 10:
         return False
 
@@ -36,8 +36,8 @@ class PassGen:
         self.passwords = []
         self.keywords_words = []
         self.keywords_words_cases = []
-        self.keywords_integer = []
-        self.keywords_birthday = []
+        self.keywords_integers = []
+        self.keywords_dates = []
         self.passwords = set()
 
     # generate all possible combinations using a list of cases
@@ -52,43 +52,46 @@ class PassGen:
     def collect_keywords(self):
 
         print('\n'
-              ' Please enter keywords associated with the target, e.g. names, numbers, birthdays;\n'
-              ' Birthdays have to have the following format: mm-dd-yyyy;\n'
+              ' Please enter keywords associated with the target, e.g. names, numbers, dates (like birthdays);\n'
+              ' Dates have to have the following format: mm-dd-yyyy;\n'
               ' After entering all your keywords, press CTRL + C to generate the password list;\n')
 
         # collect and categorize keywords
         while True:
             try:
                 keyword = input(' > ')
+
                 if len(keyword.replace(' ', '')) == 0:
                     pass
+
                 elif is_integer(keyword):
-                    self.keywords_integer.append(keyword)
-                elif is_birthday(keyword):
-                    self.keywords_birthday.append(keyword)
+                    self.keywords_integers.append(keyword)
+
+                elif is_date(keyword):
+                    self.keywords_dates.append(keyword)
+
                 else:
                     self.keywords_words.append(keyword)
+
             except KeyboardInterrupt:
                 print('\n')
                 break
 
     def combine_words(self):
 
-        # add word in reverse
-        for i in range(len(self.keywords_words)):
-            self.keywords_words.append(self.keywords_words[i][::-1])
-
         # add integers in reverse
-        for i in range(len(self.keywords_integer)):
-                self.keywords_integer.append(self.keywords_integer[i][::-1])
+        for i in range(len(self.keywords_integers)):
+            self.keywords_integers.append(self.keywords_integers[i][::-1])
 
         # generate all possible case combinations for word and it's parts
         for word in self.keywords_words:
-            self.keywords_words_cases.append(word)
+            self.keywords_words_cases.append(word)  # add word
+            self.keywords_words_cases.append(word[::-1])  # add word in reverse
+            cases_list = []
 
             if ' ' in word:
                 word_parts = word.split(' ')
-                cases_list = []
+                self.keywords_words_cases.append(''.join(word_parts)[::-1])  # add word without spaces in reverse
 
                 for part in word_parts:
                     self.keywords_words_cases.append(part)
@@ -96,10 +99,14 @@ class PassGen:
                     part_cases = cases(part)
                     cases_list.append(part_cases)
 
-                self.chain_cases(cases_list)
+            else:
+                word_cases = cases(word)
+                cases_list.append(word_cases)
+
+            self.chain_cases(cases_list)
 
         # add each custom integer as possible password
-        for i in self.keywords_integer:
+        for i in self.keywords_integers:
             self.passwords.add(i)
 
         # generate passwords using all the parts and case combinations
@@ -119,32 +126,32 @@ class PassGen:
 
             # passwords with custom integers around it
             word_custom_number_combinations = []
-            for i in self.keywords_integer:
+            for i in self.keywords_integers:
                 word_custom_number_combinations += [
                     '{}{}'.format(word, i),
                     '{}{}'.format(i, word),
                     '{0}{1}{0}'.format(i, word)
                 ]
 
-                for combination in (word_number_combinations + word_custom_number_combinations):
-                    self.passwords.add(combination)
+            for combination in (word_number_combinations + word_custom_number_combinations):
+                self.passwords.add(combination)
 
-            # passwords with birthday combinations in them
-            for birthday in self.keywords_birthday:
-                birthday_parts = birthday.split('-')
-                birthday_month = birthday_parts[0]
-                birthday_day = birthday_parts[1]
-                birthday_year = birthday_parts[2]
+            # passwords with date combinations in them
+            for date in self.keywords_dates:
+                date_parts = date.split('-')
+                data_month = date_parts[0]
+                date_day = date_parts[1]
+                date_year = date_parts[2]
 
-                word_birthday_combinations = [
-                    '{}{}'.format(word, birthday_year),
-                    '{}{}'.format(birthday_year, word),
-                    '{}{}{}{}'.format(word, birthday_day, birthday_month, birthday_year),
-                    '{}{}{}{}'.format(word, birthday_month, birthday_day, birthday_year),
-                    '{}{}{}{}'.format(word, birthday_year, birthday_month, birthday_day)
+                word_date_combinations = [
+                    '{}{}'.format(word, date_year),
+                    '{}{}'.format(date_year, word),
+                    '{}{}{}{}'.format(word, date_day, data_month, date_year),
+                    '{}{}{}{}'.format(word, data_month, date_day, date_year),
+                    '{}{}{}{}'.format(word, date_year, data_month, date_day)
                 ]
 
-                for combination in word_birthday_combinations:
+                for combination in word_date_combinations:
                     self.passwords.add(combination)
 
     def generator(self):
