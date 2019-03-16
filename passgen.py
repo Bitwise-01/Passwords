@@ -2,141 +2,133 @@
 # Author: Mohamed
 # Description: A password generator
 
+from time import time
+
+
+def is_integer(input_string):
+    integer_list = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    for char in input_string:
+        if char not in integer_list:
+            return False
+    return True
+
+
+def is_birthday(input_string):
+    if len(input_string) != 10:
+        return False
+
+    if input_string.count('-') != 2:
+        return False
+
+    if not is_integer(input_string.replace('-', '')):
+        return False
+
+    return True
+
+
+def cases(input_string):
+    return [input_string.lower(), input_string.title(), input_string.upper()]
+
 
 class PassGen:
 
     def __init__(self):
-        self.pet = None
-        self.child = None
-        self.spouse = None
-        self.target = None 
         self.passwords = []
-    
-    def prompt(self, txt):
-        return str(input(txt))
+        self.keywords_words = []
+        self.keywords_words_cases = []
+        self.keywords_integer = []
+        self.keywords_birthday = []
+        self.passwords = set()
 
-    def question(self, target):
-        answers = {}
+    def chain_cases(self, case_list, i=0, input_combination=''):
+        for case in case_list[i]:
+            combination = input_combination + case
+            if len(case_list) == (i + 1):
+                self.keywords_words_cases.append(combination)
+            else:
+                self.chain_cases(case_list, i=i + 1, input_combination=combination)
 
-        answers['firstname'] = self.prompt('Enter {}\'s first name: '.format(target))
-        answers['lastname'] = self.prompt('Enter {}\'s last name: '.format(target))
-        answers['nickname'] = self.prompt('Enter {}\'s nick name: '.format(target))
+    def collect_keywords(self):
+
+        print('\n'
+              ' Please enter keywords associated with the target, e.g. names, numbers, birthdays;\n'
+              ' Birthdays have to have the following format: mm-dd-yyyy;\n'
+              ' After entering all your keywords, press CTRL + C to generate the password list;\n')
 
         while True:
-            bday = self.prompt('Enter {}\'s birthday (mm-dd-yyyy): '.format(target))
-
-            if not len(bday.strip()):
+            try:
+                keyword = input(' > ')
+                if len(keyword.replace(' ', '')) == 0:
+                    pass
+                elif is_integer(keyword):
+                    self.keywords_integer.append(keyword)
+                elif is_birthday(keyword):
+                    self.keywords_birthday.append(keyword)
+                else:
+                    self.keywords_words.append(keyword)
+            except KeyboardInterrupt:
+                print('\n')
                 break
 
-            if len(bday.split('-')) != 3:
-                print('Invalid birthday format\n')
-                continue
-            
-            for _ in bday.split('-'):
-                if not _.isdigit():
-                    print('Birthday only requires numbers\n')
-                    continue
-            
-            mm, dd, yyyy = bday.split('-')
-            
-            if int(mm) > 12 or int(dd) > 31 or len(yyyy) != 4:
-                print('Invalid birthday\n')
-                continue
-            
-            bday = { 'month': int(mm), 'day': int(dd), 'year': int(yyyy) }
-            break 
-            
-        answers['birthday'] = bday
-        return answers   
+    def combine_words(self):
+        for word in self.keywords_words:
 
-    def cases(self, word):
-        return [word.lower(), word.title()]    
-    
-    def fullname(self, fname, lname):
-        return ['{}{}'.format(a, b) for a in self.cases(fname) for b in self.cases(lname)]
+            self.keywords_words_cases.append(word)
 
-    def format_names(self):                        
-        for _ in range(1000):
+            if ' ' in word:
+                word_parts = word.split(' ')
+                cases_list = []
 
-            iters = 0
-            for data in [self.target, self.spouse, self.child, self.pet]:
+                for part in word_parts:
+                    part_cases = cases(part)
+                    cases_list.append(part_cases)
 
-                for n in ['firstname', 'lastname', 'nickname']:
+                self.chain_cases(cases_list)
 
-                    fullname_list = []
-                    name = data[n].strip()
+        for word in (self.keywords_words + self.keywords_words_cases):
+            self.passwords.add(word)
 
-                    if not len(name):
-                        continue
-                    
-                    if not iters:
-                        fullname_list = self.fullname(data['firstname'], data['lastname'])
-                        iters += 1
-                    
-                    for word in self.cases(name) + fullname_list:
+            for i in range(2100):
+                word_number_combinations = [
+                    '{}{}'.format(word, i),
+                    '{}{}'.format(i, word),
+                    '{0}{1}{0}'.format(i, word)
+                ]
 
-                        a, b, c = ('{}{}'.format(word, _), 
-                                  '{}{}'.format(_, word), 
-                                  '{0}{1}{0}'.format(_, word)
-                                  )
+                for combination in word_number_combinations:
+                    self.passwords.add(combination)
 
-                        if not word in self.passwords:
-                            self.passwords.append(word)
+                for birthday in self.keywords_birthday:
+                    birthday_parts = birthday.split('-')
+                    birthday_month = birthday_parts[0]
+                    birthday_day = birthday_parts[1]
+                    birthday_year = birthday_parts[2]
 
-                        if not a in self.passwords:
-                            self.passwords.append(a)
-                        
-                        if not b in self.passwords:
-                            self.passwords.append(b)
+                    word_birthday_combinations = [
+                        '{}{}'.format(word, birthday_year),
+                        '{}{}'.format(birthday_year, word),
+                        '{}{}{}{}'.format(word, birthday_month, birthday_day, birthday_year),
+                        '{}{}{}{}'.format(word, birthday_day, birthday_month, birthday_year)
+                    ]
 
-                        if not c in self.passwords:
-                            self.passwords.append(c)
+                    for combination in word_birthday_combinations:
+                        self.passwords.add(combination)
 
-                        bday = data['birthday']
-
-                        if bday:
-                            d, e, f, g = (
-                                '{}{}'.format(word, bday['year']),
-                                '{}{}'.format(bday['year'], word),
-                                '{}{}{}{}'.format(word, bday['month'], bday['day'], bday['year']),
-                                '{}{}{}{}'.format(word, bday['day'], bday['month'], bday['year'])
-                            )
-
-                            if not d in self.passwords:
-                                self.passwords.append(d)
-                            
-                            if not e in self.passwords:
-                                self.passwords.append(e)
-                            
-                            if not f in self.passwords:
-                                self.passwords.append(f)
-
-                            if not g in self.passwords:
-                                self.passwords.append(g)      
-        
     def generator(self):
-        self.target = self.question('target')  
-        print('\n')
+        self.collect_keywords()
+        self.combine_words()
 
-        self.spouse = self.question('spouse')
-        print('\n')
+        password_file_name = 'passwords_' + str(round(time())) + '.txt'
+        print(' Passwords Generated: {}'.format(len(self.passwords)))
 
-        self.child = self.question('child')
-        print('\n')
+        with open(password_file_name, 'w+') as password_file:
+            for password in self.passwords:
+                password_file.write(password + '\n')
 
-        self.pet = self.question('pet')
-        print('\n')
+        print(' Passwords written to {}'. format(password_file_name))
+
+        input(' Press any key to exit ...')
+
         
-        self.format_names()
-
-        output_file = '{}.txt'.format(self.target['firstname'].lower()
-                             if self.target['firstname'] else 'pass.txt')
-        
-        with open(output_file, 'wt') as f:
-            for pwd in self.passwords:
-                f.write('{}\n'.format(pwd))
-
-        print('Passwords Generated: {}'. format(len(self.passwords)))
-
 if __name__ == '__main__':
     PassGen().generator()
