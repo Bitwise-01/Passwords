@@ -98,21 +98,22 @@ class PassGen:
                 for combination in word_number_combinations:
                     self.passwords.add(combination)
 
-                for birthday in self.keywords_birthday:
-                    birthday_parts = birthday.split('-')
-                    birthday_month = birthday_parts[0]
-                    birthday_day = birthday_parts[1]
-                    birthday_year = birthday_parts[2]
+            for birthday in self.keywords_birthday:
+                birthday_parts = birthday.split('-')
+                birthday_month = birthday_parts[0]
+                birthday_day = birthday_parts[1]
+                birthday_year = birthday_parts[2]
 
-                    word_birthday_combinations = [
-                        '{}{}'.format(word, birthday_year),
-                        '{}{}'.format(birthday_year, word),
-                        '{}{}{}{}'.format(word, birthday_month, birthday_day, birthday_year),
-                        '{}{}{}{}'.format(word, birthday_day, birthday_month, birthday_year)
-                    ]
+                word_birthday_combinations = [
+                    '{}{}'.format(word, birthday_year),
+                    '{}{}'.format(birthday_year, word),
+                    '{}{}{}{}'.format(word, birthday_day, birthday_month, birthday_year),
+                    '{}{}{}{}'.format(word, birthday_month, birthday_day, birthday_year),
+                    '{}{}{}{}'.format(word, birthday_year, birthday_month, birthday_day)
+                ]
 
-                    for combination in word_birthday_combinations:
-                        self.passwords.add(combination)
+                for combination in word_birthday_combinations:
+                    self.passwords.add(combination)
 
     def generator(self):
         self.collect_keywords()
@@ -122,13 +123,12 @@ class PassGen:
         print(' Passwords Generated: {}'.format(len(self.passwords)))
 
         with open(password_file_name, 'w+') as password_file:
-            for password in self.passwords:
+            for password in sorted(self.passwords):
                 password_file.write(password + '\n')
 
         print(' Passwords written to {}'. format(password_file_name))
-
         input(' Press any key to exit ...')
 
-        
+
 if __name__ == '__main__':
     PassGen().generator()
