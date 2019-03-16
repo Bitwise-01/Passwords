@@ -116,9 +116,6 @@ class PassGen:
                     '{0}{1}{0}'.format(i, word)
                 ]
 
-                for combination in word_number_combinations:
-                    self.passwords.add(combination)
-
             # passwords with custom integers around it
             for i in self.keywords_integer:
                 word_custom_number_combinations = [
