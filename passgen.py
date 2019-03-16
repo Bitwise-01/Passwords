@@ -109,16 +109,18 @@ class PassGen:
             self.passwords.add(word)
 
             # passwords with integers 0-2100 around it
+            word_number_combinations = []
             for i in range(2100):
-                word_number_combinations = [
+                word_number_combinations += [
                     '{}{}'.format(word, i),
                     '{}{}'.format(i, word),
                     '{0}{1}{0}'.format(i, word)
                 ]
 
             # passwords with custom integers around it
+            word_custom_number_combinations = []
             for i in self.keywords_integer:
-                word_custom_number_combinations = [
+                word_custom_number_combinations += [
                     '{}{}'.format(word, i),
                     '{}{}'.format(i, word),
                     '{0}{1}{0}'.format(i, word)
