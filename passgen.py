@@ -3,140 +3,122 @@
 # Description: A password generator
 
 
+class List:
+
+    def __init__(self):
+        self.items = []
+
+    def __contains__(self, item):
+        return item in self.items
+
+    def __iter__(self):
+        while len(self.items):
+            yield self.items.pop(0)
+
+    def __len__(self):
+        return len(self.items)
+
+    def append(self, item, front=False):
+        if not item in self.items:
+            self.items.append(item)
+
+        for _ in (item.lower(), item.title(), item.upper()):
+            if _ in self.items:
+                continue
+
+            if front:
+                self.items.insert(0, _)
+            else:
+                self.items.append(_)
+
+
 class PassGen:
 
     def __init__(self):
-        self.pet = None
-        self.child = None
-        self.spouse = None
-        self.target = None 
-        self.passwords = []
-    
-    def prompt(self, txt):
-        return str(input(txt))
+        self.words = []
+        self.b_days = []
+        self.is_alive = True
+        self.password_list = List()
+        self.suffix = [_ for _ in range(124)]
 
-    def question(self, target):
-        answers = {}
+    def get_input(self):
+        while self.is_alive:
+            print(
+                'Enter a keyword, name, password, number, symbol, or birthday(mm-dd-yyy)')
+            print('To generate a password list enter generate')
 
-        answers['firstname'] = self.prompt('Enter {}\'s first name: '.format(target))
-        answers['lastname'] = self.prompt('Enter {}\'s last name: '.format(target))
-        answers['nickname'] = self.prompt('Enter {}\'s nick name: '.format(target))
+            try:
+                user_input = str(input('\n$> ')).strip()
+            except:
+                self.is_alive = False
 
-        while True:
-            bday = self.prompt('Enter {}\'s birthday (mm-dd-yyyy): '.format(target))
-
-            if not len(bday.strip()):
-                break
-
-            if len(bday.split('-')) != 3:
-                print('Invalid birthday format\n')
+            if not self.is_alive or not user_input:
                 continue
-            
-            for _ in bday.split('-'):
-                if not _.isdigit():
-                    print('Birthday only requires numbers\n')
-                    continue
-            
-            mm, dd, yyyy = bday.split('-')
-            
-            if int(mm) > 12 or int(dd) > 31 or len(yyyy) != 4:
-                print('Invalid birthday\n')
+
+            if user_input.lower() != 'generate':
+                self.append_data(user_input)
+            else:
+                self.generate()
+                self.is_alive = False
                 continue
-            
-            bday = { 'month': int(mm), 'day': int(dd), 'year': int(yyyy) }
-            break 
-            
-        answers['birthday'] = bday
-        return answers   
 
-    def cases(self, word):
-        return [word.lower(), word.title()]    
-    
-    def fullname(self, fname, lname):
-        return ['{}{}'.format(a, b) for a in self.cases(fname) for b in self.cases(lname)]
+            print('\n')
 
-    def format_names(self):                        
-        for _ in range(1000):
+    def append_data(self, data):
+        if len(data.split('-')) == 3:  # birthday
+            if not data in self.b_days:
+                self.b_days.append(data)
 
-            iters = 0
-            for data in [self.target, self.spouse, self.child, self.pet]:
+        elif data.isdigit():  # number
+            if not data in self.suffix:
+                self.suffix.insert(0, data)
 
-                for n in ['firstname', 'lastname', 'nickname']:
+        elif len([_ for _ in data if _.isdigit()]) == (len(data) - 1):  # float
+            if not data in self.suffix:
+                self.suffix.insert(0, data)
+                self.suffix.insert(0, ''.join(
+                    [_ for _ in data if _.isdigit()]))
 
-                    fullname_list = []
-                    name = data[n].strip()
+        elif data.isalpha():  # words
+            if not data.lower() in self.words:
+                self.words.append(data)
 
-                    if not len(name):
-                        continue
-                    
-                    if not iters:
-                        fullname_list = self.fullname(data['firstname'], data['lastname'])
-                        iters += 1
-                    
-                    for word in self.cases(name) + fullname_list:
+        elif len([_ for _ in data if not _.isalpha() and not _.isdigit()]) == len(data):  # symbol
+            if not data in self.suffix:
+                self.suffix.insert(0, data)
 
-                        a, b, c = ('{}{}'.format(word, _), 
-                                  '{}{}'.format(_, word), 
-                                  '{0}{1}{0}'.format(_, word)
-                                  )
+        else:  # password
+            self.password_list.append(data, front=True)
 
-                        if not word in self.passwords:
-                            self.passwords.append(word)
+    def generate(self):
 
-                        if not a in self.passwords:
-                            self.passwords.append(a)
-                        
-                        if not b in self.passwords:
-                            self.passwords.append(b)
+        for num in self.suffix:
 
-                        if not c in self.passwords:
-                            self.passwords.append(c)
+            for word in self.words:
 
-                        bday = data['birthday']
+                self.password_list.append(word)
+                self.password_list.append(f'{word}{num}')
+                self.password_list.append(f'{num}{word}')
+                self.password_list.append(f'{num}{word}{num}')
 
-                        if bday:
-                            d, e, f, g = (
-                                '{}{}'.format(word, bday['year']),
-                                '{}{}'.format(bday['year'], word),
-                                '{}{}{}{}'.format(word, bday['month'], bday['day'], bday['year']),
-                                '{}{}{}{}'.format(word, bday['day'], bday['month'], bday['year'])
-                            )
+                for bday in self.b_days:
 
-                            if not d in self.passwords:
-                                self.passwords.append(d)
-                            
-                            if not e in self.passwords:
-                                self.passwords.append(e)
-                            
-                            if not f in self.passwords:
-                                self.passwords.append(f)
+                    year = bday.split('-')[-1]
+                    plain_bday = bday.replace('-', '')
 
-                            if not g in self.passwords:
-                                self.passwords.append(g)      
-        
-    def generator(self):
-        self.target = self.question('target')  
-        print('\n')
+                    self.password_list.append(plain_bday)
+                    self.password_list.append(f'{word}{year}')
+                    self.password_list.append(f'{word}{year[2:]}')
+                    self.password_list.append(f'{word}{plain_bday}')
 
-        self.spouse = self.question('spouse')
-        print('\n')
+        with open('pass.txt', 'wt', encoding='utf-8') as output_file:
 
-        self.child = self.question('child')
-        print('\n')
+            print(
+                f'Generating a list of {len(self.password_list)} passwords ...')
 
-        self.pet = self.question('pet')
-        print('\n')
-        
-        self.format_names()
+            for pwd in self.password_list:
+                output_file.write(f'{pwd}\n')
 
-        output_file = '{}.txt'.format(self.target['firstname'].lower()
-                             if self.target['firstname'] else 'pass.txt')
-        
-        with open(output_file, 'wt') as f:
-            for pwd in self.passwords:
-                f.write('{}\n'.format(pwd))
-
-        print('Passwords Generated: {}'. format(len(self.passwords)))
 
 if __name__ == '__main__':
-    PassGen().generator()
+    PassGen().get_input()
