@@ -85,7 +85,7 @@ class PassGen:
 
                 self.chain_cases(cases_list)
 
-        for word in (self.keywords_words + self.keywords_words_cases):
+        for word in self.keywords_words_cases:
             self.passwords.add(word)
 
             for i in range(2100):
