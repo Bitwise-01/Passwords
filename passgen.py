@@ -40,6 +40,7 @@ class PassGen:
         self.keywords_birthday = []
         self.passwords = set()
 
+    # generate all possible combinations of a list of case combinations
     def chain_cases(self, case_list, i=0, input_combination=''):
         for case in case_list[i]:
             combination = input_combination + case
@@ -55,6 +56,7 @@ class PassGen:
               ' Birthdays have to have the following format: mm-dd-yyyy;\n'
               ' After entering all your keywords, press CTRL + C to generate the password list;\n')
 
+        # collect and categorize keywords
         while True:
             try:
                 keyword = input(' > ')
@@ -71,8 +73,17 @@ class PassGen:
                 break
 
     def combine_words(self):
-        for word in self.keywords_words:
 
+        # add word in reverse
+        for i in range(len(self.keywords_words)):
+            self.keywords_words.append(self.keywords_words[i][::-1])
+
+        # add integers in reverse
+        for i in range(len(self.keywords_integer)):
+                self.keywords_integer.append(self.keywords_integer[i][::-1])
+
+        # generate all possible case combinations for word and it's parts
+        for word in self.keywords_words:
             self.keywords_words_cases.append(word)
 
             if ' ' in word:
@@ -80,17 +91,24 @@ class PassGen:
                 cases_list = []
 
                 for part in word_parts:
+                    self.keywords_words_cases.append(part)
+                    self.keywords_words_cases.append(part[::-1])
                     part_cases = cases(part)
                     cases_list.append(part_cases)
 
                 self.chain_cases(cases_list)
 
+        # add each custom integer as possible password
         for i in self.keywords_integer:
             self.passwords.add(i)
 
+        # generate passwords using all the parts and case combinations
         for word in self.keywords_words_cases:
+
+            # add each word/part/case-combination as password
             self.passwords.add(word)
 
+            # passwords with integers 0-2100 around it
             for i in range(2100):
                 word_number_combinations = [
                     '{}{}'.format(word, i),
@@ -101,6 +119,7 @@ class PassGen:
                 for combination in word_number_combinations:
                     self.passwords.add(combination)
 
+            # passwords with custom integers around it
             for i in self.keywords_integer:
                 word_custom_number_combinations = [
                     '{}{}'.format(word, i),
@@ -111,6 +130,7 @@ class PassGen:
                 for combination in (word_number_combinations + word_custom_number_combinations):
                     self.passwords.add(combination)
 
+            # passwords with birthday combinations in them
             for birthday in self.keywords_birthday:
                 birthday_parts = birthday.split('-')
                 birthday_month = birthday_parts[0]
