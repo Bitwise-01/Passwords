@@ -85,6 +85,9 @@ class PassGen:
 
                 self.chain_cases(cases_list)
 
+        for i in self.keywords_integer:
+            self.passwords.add(i)
+
         for word in self.keywords_words_cases:
             self.passwords.add(word)
 
@@ -96,6 +99,16 @@ class PassGen:
                 ]
 
                 for combination in word_number_combinations:
+                    self.passwords.add(combination)
+
+            for i in self.keywords_integer:
+                word_custom_number_combinations = [
+                    '{}{}'.format(word, i),
+                    '{}{}'.format(i, word),
+                    '{0}{1}{0}'.format(i, word)
+                ]
+
+                for combination in (word_number_combinations + word_custom_number_combinations):
                     self.passwords.add(combination)
 
             for birthday in self.keywords_birthday:
