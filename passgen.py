@@ -40,7 +40,7 @@ class PassGen:
         self.keywords_birthday = []
         self.passwords = set()
 
-    # generate all possible combinations of a list of case combinations
+    # generate all possible combinations using a list of cases
     def chain_cases(self, case_list, i=0, input_combination=''):
         for case in case_list[i]:
             combination = input_combination + case
