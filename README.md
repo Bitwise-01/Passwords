@@ -1,4 +1,7 @@
 # Passwords
-Get or generate a password list
 
+Generates a large password list
 
+# Requirement
+
+Python 3

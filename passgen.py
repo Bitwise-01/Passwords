@@ -19,10 +19,7 @@ class List:
         return len(self.items)
 
     def append(self, item, front=False):
-        if not item in self.items:
-            self.items.append(item)
-
-        for _ in (item.lower(), item.title(), item.upper()):
+        for _ in (item, item.lower(), item.title(), item.upper()):
             if _ in self.items:
                 continue
 
@@ -91,18 +88,23 @@ class PassGen:
             self.password_list.append(data, front=True)
 
     def generate(self):
+        print('Generating a list, this might take a while ')
+        for suffix in self.suffix:
 
-        for num in self.suffix:
-
-            for word in self.words:
+            for word in self.words + [a + b for w1 in self.words
+                                      for w2 in self.words
+                                      for a in [w1, w1.lower(), w1.title(), w1.upper()]
+                                      for b in [w1, w1.lower(), w1.title(), w1.upper()]]:
 
                 self.password_list.append(word)
-                self.password_list.append(f'{word}{num}')
-                self.password_list.append(f'{num}{word}')
-                self.password_list.append(f'{num}{word}{num}')
+                self.password_list.append(f'{word}{suffix}')
+                self.password_list.append(f'{suffix}{word}')
+                self.password_list.append(f'{suffix}{word}{suffix}')
 
                 for bday in self.b_days:
 
+                    day = bday.split('-')[1]
+                    month = bday.split('-')[0]
                     year = bday.split('-')[-1]
                     plain_bday = bday.replace('-', '')
 
@@ -111,10 +113,60 @@ class PassGen:
                     self.password_list.append(f'{word}{year[2:]}')
                     self.password_list.append(f'{word}{plain_bday}')
 
+                    self.password_list.append(f'{day}{word}')
+                    self.password_list.append(f'{day[-1]}{word}')
+
+                    self.password_list.append(f'{year}{word}')
+                    self.password_list.append(f'{year[2:]}{word}')
+
+                    self.password_list.append(f'{month}{word}')
+                    self.password_list.append(f'{month[-1]}{word}')
+
+                    self.password_list.append(f'{month}{day}{word}')
+                    self.password_list.append(f'{month[-1]}{day}{word}')
+                    self.password_list.append(f'{month}{day[-1]}{word}')
+                    self.password_list.append(f'{month[-1]}{day[-1]}{word}')
+
+                    self.password_list.append(f'{day}{month}{word}')
+                    self.password_list.append(f'{day[-1]}{month}{word}')
+                    self.password_list.append(f'{day}{month[-1]}{word}')
+                    self.password_list.append(f'{day[-1]}{month[-1]}{word}')
+
+                    self.password_list.append(f'{month}{day}{word}{year}')
+                    self.password_list.append(f'{month}{day}{word}{year[2:]}')
+
+                    self.password_list.append(f'{month[-1]}{day}{word}{year}')
+                    self.password_list.append(
+                        f'{month[-1]}{day}{word}{year[2:]}')
+
+                    self.password_list.append(f'{month}{day[-1]}{word}{year}')
+                    self.password_list.append(
+                        f'{month}{day[-1]}{word}{year[2:]}')
+
+                    self.password_list.append(
+                        f'{month[-1]}{day[-1]}{word}{year}')
+                    self.password_list.append(
+                        f'{month[-1]}{day[-1]}{word}{year[2:]}')
+
+                    self.password_list.append(f'{month}{word}{suffix}')
+                    self.password_list.append(f'{month[-1]}{word}{suffix}')
+
+                    self.password_list.append(f'{day}{word}{suffix}')
+                    self.password_list.append(f'{day[-1]}{word}{suffix}')
+
+                    self.password_list.append(f'{suffix}{word}{month}')
+                    self.password_list.append(f'{suffix}{word}{month[-1]}')
+
+                    self.password_list.append(f'{suffix}{word}{day}')
+                    self.password_list.append(f'{suffix}{word}{day[-1]}')
+
+                    self.password_list.append(f'{suffix}{word}{year}')
+                    self.password_list.append(f'{suffix}{word}{year[2:]}')
+
         with open('pass.txt', 'wt', encoding='utf-8') as output_file:
 
             print(
-                f'Generating a list of {len(self.password_list)} passwords ...')
+                f'Generated a list of {len(self.password_list)} passwords ...')
 
             for pwd in self.password_list:
                 output_file.write(f'{pwd}\n')
