@@ -69,12 +69,17 @@ class PassGen:
         elif data.isdigit():  # number
             if not data in self.suffix:
                 self.suffix.insert(0, data)
+            self.password_list.append(data, front=True)
 
         elif len([_ for _ in data if _.isdigit()]) == (len(data) - 1):  # float
             if not data in self.suffix:
                 self.suffix.insert(0, data)
                 self.suffix.insert(0, ''.join(
                     [_ for _ in data if _.isdigit()]))
+            self.password_list.append(data, front=True)
+
+            self.password_list.append(''.join(
+                [_ for _ in data if _.isdigit()]), front=True)
 
         elif data.isalpha():  # words
             if not data.lower() in self.words:
