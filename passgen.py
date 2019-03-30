@@ -96,10 +96,7 @@ class PassGen:
         print('Generating a list, this might take a while ')
         for suffix in self.suffix:
 
-            for word in self.words + [a + b for w1 in self.words
-                                      for w2 in self.words
-                                      for a in [w1, w1.lower(), w1.title(), w1.upper()]
-                                      for b in [w1, w1.lower(), w1.title(), w1.upper()]]:
+            for word in self.words:
 
                 self.password_list.append(word)
                 self.password_list.append(f'{word}{suffix}')
