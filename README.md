@@ -14,5 +14,13 @@ cd BruteForceDictionaryGenerator
 sudo apt-get install python3
 ```
 ## Windows
-1) To install python in Windows go to the https://www.python.org/downloads/<br>
-2) Run the `executable/passgen.exe` file
+To install python in Windows go to the https://www.python.org/downloads/<br>
+
+# How to run it?
+## Run the script Ubuntu/Debian/Mac
+In terminal write: `python3 passgen.py`
+## Run the script Windows
+Run the `executable/passgen.exe` file
+# How to use it?
+Write down all possible information. Dividing it through enter. Then write a `generate`.<br>
+The program will create `pass.txt`
