@@ -25,3 +25,6 @@ Run the `executable/passgen.exe` file
 # How to use it?
 Write down all possible information. Dividing it through enter. Then write a `generate`.<br>
 The program will create `pass.txt`
+
+# Databases
+You can use already made databases. They are stored in a directory: `databases/`
