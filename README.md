@@ -3,13 +3,13 @@
 Get a large list of passwords with minimal effort
 
 # Install on Ubuntu/Debian/Mac
-## Download
+### Download
 First, clone the repository on your computer.And then go to the desired directory.<br>
 ```bash
 git clone https://github.com/rodukov/BruteForceDictionaryGenerator
 cd BruteForceDictionaryGenerator
 ```
-## Install requirements
+### Install requirements
 ```bash
 sudo apt-get install python3
 ```
