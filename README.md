@@ -2,19 +2,18 @@
 # Passwords ![Python](https://img.shields.io/badge/python-3670A0?style=flat-square&logo=python&logoColor=ffdd54) ![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black) ![Windows](https://img.shields.io/badge/Windows-0078D6?style=flat-square&logo=windows&logoColor=white) ![MacOS](https://img.shields.io/badge/MacOS-%23000000.svg?style=flat-square&logo=apple&logoColor=white)
 Get a large list of passwords with minimal effort
 
-# Lets install it!
-## Ubuntu/Debian/Mac
-### Download
+# Install on Ubuntu/Debian/Mac
+## Download
 First, clone the repository on your computer.And then go to the desired directory.<br>
 ```bash
 git clone https://github.com/rodukov/BruteForceDictionaryGenerator
 cd BruteForceDictionaryGenerator
 ```
-### Install requirements
+## Install requirements
 ```bash
 sudo apt-get install python3
 ```
-## Windows
+### About Windows
 To install python in Windows go to the https://www.python.org/downloads/<br>
 
 # How to run it?
