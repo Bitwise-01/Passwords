@@ -1,4 +1,5 @@
-# Passwords
+
+# Passwords ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 Get a large list of passwords with minimal effort
 
 # Lets install it!
